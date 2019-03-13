@@ -8,7 +8,7 @@ This is a collection of various scripts that I have made that were not substanti
 ### Maximum Replacer
 Renaming operations can sometimes be tricky. Maya comes with a renaming ability, but it is rather trivial.  When cases arise where the functionality of built-in renaming is not sufficient, it is not uncommon to create a one-time script or even resort to manual renaming.  Coincidentally, [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) are especially proficient in pattern matching and can be used to aid string substitution.  Maximum Replacer lets you select and rename rename objects using regular expressions, making those convoluted rename operations a walk in the park.  Providing your regular expressions are up-to-scratch, of course.
 
-![Maximum Replacer](https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/maximumreplacer/maximumreplacer.png)
+<img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/maximumreplacer/maximumreplacer.png" width="50%" alt="Maximum Replacer" />
 
 #### Notes
 - To use this tool efficiently, you will have to know how to use regular expressions.
