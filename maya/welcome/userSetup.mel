@@ -1,0 +1,1 @@
+scriptJob -ro true -per -e "idle" "inViewMessage -fts 42 -pos \"midCenterTop\" -fade -msg (\"Welcome, <font color=\'#00ff00\'><b>\" + `getenv USER` + \"</b></font>!\");";

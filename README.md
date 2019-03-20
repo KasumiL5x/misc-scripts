@@ -10,6 +10,11 @@ Renaming operations can sometimes be tricky. Maya comes with a renaming ability,
 
 <img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/maximumreplacer/maximumreplacer.png" width="50%" alt="Maximum Replacer" />
 
+### Welcome
+Who doesn't want to be welcomed to their Maya session?  Add this to your `userSetup.mel` to be greeted with a warm message.  It displays only once Maya is fully done loading and is **ready to use**, which is why I use it.
+
+![Welcome](https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/welcome/welcome.png)
+
 #### Notes
 - To use this tool efficiently, you will have to know how to use regular expressions.
 - In both Max and Maya, all renames are grouped into a chunk.  Therefore, a single undo can reverse all rename operations in one go, regardless of the count.
