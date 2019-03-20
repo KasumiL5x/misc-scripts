@@ -26,7 +26,7 @@ Who doesn't want to be welcomed to their Maya session?  Add this to your `userSe
 ### AnimCurve Toolbox
 [animCurve](http://help.autodesk.com/cloudhelp/2016/ENU/Maya-Tech-Docs/Nodes/animCurve.html) nodes in Maya are fantastic. They are, however, astonishingly difficult to locate within Maya unless you are one with the code-foo – they can only be created and keyframed through scripting. AnimCurve Toolbox is a very modest tool to assist with using animCurve nodes. It allows for creation, simple editing, and selection of various types of the node.
 
-<img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/animcurvetb/animcurvetb.png" width="50%" alt="AnimCurve Toolbox" />
+<img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/animcurvetb/animcurvetb.png" width="30%" alt="AnimCurve Toolbox" />
 
 #### Usage
 Creating curves is very simple. Within the **Create** group, there exists a dropdown with various types of animCurve node, followed by a textbox where a name can be specified. Below is a button for creating the desired curve type, which is named appropriately.
