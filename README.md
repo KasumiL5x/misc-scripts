@@ -21,6 +21,27 @@ Who doesn't want to be welcomed to their Maya session?  Add this to your `userSe
 
 ![Welcome](https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/welcome/welcome.png)
 
+---
+
+### AnimCurve Toolbox
+[animCurve](http://help.autodesk.com/cloudhelp/2016/ENU/Maya-Tech-Docs/Nodes/animCurve.html) nodes in Maya are fantastic. They are, however, astonishingly difficult to locate within Maya unless you are one with the code-foo – they can only be created and keyframed through scripting. AnimCurve Toolbox is a very modest tool to assist with using animCurve nodes. It allows for creation, simple editing, and selection of various types of the node.
+
+<img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/animcurvetb/animcurvetb.png" width="50%" alt="AnimCurve Toolbox" />
+
+#### Usage
+Creating curves is very simple. Within the **Create** group, there exists a dropdown with various types of animCurve node, followed by a textbox where a name can be specified. Below is a button for creating the desired curve type, which is named appropriately.
+
+The lower section, **Edit**, contains yet another dropdown, this time with an accompanying button to its side. The dropdown will display all animCurve nodes within the scene (including ones created externally to this tool). The aforementioned button will refresh the dropdown with the current state of the scene. This tool does not automatically update this list, so remember to press the button.
+
+Adding keyframes to animCurve nodes shouldn't be hard. Unfortunately, Maya has a penchant for making things hard. Luckily, this tool makes it easy. Clicking the **Add Keyframe** button will prompt you for both a time and value for the key. The currently active curve in the dropdown above will be used.
+
+Since animCurve nodes are not DAG objects, they will appear in the Outliner only when *DAG Objects Only* is disabled. Disabling this clutters the list, and can make finding your nodes difficult. Instead, this tool provides a Select button. Clicking this button will replace the active selection with the curve specified in the dropdown above. If **shift** is held when clicking the button, the selection will instead be appended.
+
+The Graph Editor is ideal for editing animCurve keyframes. Instead of having to select them using this tool, or by hand, and then opening the Graph Editor manually, the **Graph Editor** button in the tool will select the curve specified in the above dropdown and then open the graph editor for easy and quick editing.
+
+#### Notes
+If you have added keyframes to an animCurve node but do not see anything in the Graph Editor, try connecting something to the animCurve's **input** plug and that should rectify the problem.
+
 
 ## Meta
 Daniel Green – [@KasumiL5x](https://twitter.com/kasumil5x) – dgreen@bournemouth.ac.uk
