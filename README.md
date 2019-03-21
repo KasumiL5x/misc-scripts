@@ -42,6 +42,13 @@ The Graph Editor is ideal for editing animCurve keyframes. Instead of having to 
 #### Notes
 If you have added keyframes to an animCurve node but do not see anything in the Graph Editor, try connecting something to the animCurve's **input** plug and that should rectify the problem.
 
+---
+
+### Align Faces
+A feature largely missing from a number of 3D software packages is the ability to align a camera perfectly to a face's normal (thank you, Modo!). Aligning the camera to a face, or average of selected faces, can be very useful for UV mapping, or even just scene navigation. This script will align the active viewport's camera to the average angle of the selected faces, maintaining its distance. Usage is simple. Call the `look_at_selected_faces()` method with at least one face selected.
+
+![AlignFaces](https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/alignfaces/alignfaces.png)
+
 
 ## Meta
 Daniel Green – [@KasumiL5x](https://twitter.com/kasumil5x) – dgreen@bournemouth.ac.uk
