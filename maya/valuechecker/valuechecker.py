@@ -65,11 +65,18 @@ class ValueChecker(QtWidgets.QDialog):
 		# attribute combobox
 		self.validation_attribs_combobox = QtWidgets.QComboBox()
 		self.validation_attribs_combobox.setFixedWidth(150)
+		self.validation_attribs_combobox.setEditable(True)
 		validation_attribs_widget.layout().addWidget(self.validation_attribs_combobox)
-		# should be lbl
-		validation_attribs_shouldbe = QtWidgets.QLabel()
-		validation_attribs_shouldbe.setText('should be')
-		validation_attribs_widget.layout().addWidget(validation_attribs_shouldbe)
+		# should be combobox
+		self.validation_attribs_shouldbe = QtWidgets.QComboBox()
+		self.validation_attribs_shouldbe.setFixedWidth(60)
+		self.validation_attribs_shouldbe.addItem('==')
+		self.validation_attribs_shouldbe.addItem('!=')
+		self.validation_attribs_shouldbe.addItem('<')
+		self.validation_attribs_shouldbe.addItem('<=')
+		self.validation_attribs_shouldbe.addItem('>')
+		self.validation_attribs_shouldbe.addItem('>=')
+		validation_attribs_widget.layout().addWidget(self.validation_attribs_shouldbe)
 		# value textbox
 		self.validation_attribs_value = QtWidgets.QLineEdit()
 		self.validation_attribs_value.setPlaceholderText('value')
@@ -134,8 +141,8 @@ class ValueChecker(QtWidgets.QDialog):
 		# self.output_tb.verticalScrollBar().setValue(self.output_tb.verticalScrollBar().maximum())
 	#end
 
-	def output_mismatch_value(self, node, attrib, expected, actual):
-		msg = '%s.%s should be %s but is %s.' % (node, attrib, expected, actual)
+	def output_mismatch_value(self, node, attrib, operator, expected, actual):
+		msg = '%s.%s should be %s %s but is %s.' % (node, attrib, operator, expected, actual)
 		self.output_tb.setText(self.output_tb.toPlainText() + msg + '\n')
 	#end
 
@@ -155,8 +162,8 @@ class ValueChecker(QtWidgets.QDialog):
 					continue
 				for c in ['tx', 'ty', 'tz']:
 					value = mc.getAttr(curr_obj + '.' + c)
-					if not self.are_floats_equal(0.0, value):
-						self.output_mismatch_value(curr_obj, c, 0.0, value)
+					if not self.are_equal(0.0, value):
+						self.output_mismatch_value(curr_obj, c, '', 0.0, value)
 						error_count += 1
 			self.output_error('Done (%s errors).\n' % error_count)
 		#end
@@ -170,8 +177,8 @@ class ValueChecker(QtWidgets.QDialog):
 					continue
 				for c in ['rx', 'ry', 'rz']:
 					value = mc.getAttr(curr_obj + '.' + c)
-					if not self.are_floats_equal(0.0, value):
-						self.output_mismatch_value(curr_obj, c, 0.0, value)
+					if not self.are_equal(0.0, value):
+						self.output_mismatch_value(curr_obj, c, '', 0.0, value)
 						error_count += 1
 			self.output_error('Done (%s errors).\n' % error_count)
 		#end
@@ -185,8 +192,8 @@ class ValueChecker(QtWidgets.QDialog):
 					continue
 				for c in ['sx', 'sy', 'sz']:
 					value = mc.getAttr(curr_obj + '.' + c)
-					if not self.are_floats_equal(1.0, value):
-						self.output_mismatch_value(curr_obj, c, 1.0, value)
+					if not self.are_equal(1.0, value):
+						self.output_mismatch_value(curr_obj, c, '', 1.0, value)
 						error_count += 1
 			self.output_error('Done (%s errors).\n' % error_count)
 		#end
@@ -204,6 +211,24 @@ class ValueChecker(QtWidgets.QDialog):
 		self.output_error('Checking custom attributes...')
 		error_count = 0
 
+		# which operation are we doing?
+		compare_func = None
+		if self.validation_attribs_shouldbe.currentText() == '==':
+			compare_func = self.are_equal
+		elif self.validation_attribs_shouldbe.currentText() == '!=':
+			compare_func = self.are_not_equal
+		elif self.validation_attribs_shouldbe.currentText() == '<':
+			compare_func = self.is_less
+		elif self.validation_attribs_shouldbe.currentText() == '<=':
+			compare_func = self.is_lequal
+		elif self.validation_attribs_shouldbe.currentText() == '>':
+			compare_func = self.is_greater
+		elif self.validation_attribs_shouldbe.currentText() == '>=':
+			compare_func = self.is_grequal
+		else:
+			self.output_error('An invalid comparison was selected.')
+			return
+
 		for curr_obj in objects:
 			# object could be deleted
 			if not mc.objExists(curr_obj):
@@ -211,41 +236,155 @@ class ValueChecker(QtWidgets.QDialog):
 
 			# attribute may not exist
 			if not mc.attributeQuery(attrib, node=curr_obj, ex=True):
+				self.output_error('Attribute not found: %s.%s.' % (curr_obj, attrib))
 				continue
 			
 			# raw attribute value from maya
 			attrib_value = mc.getAttr(curr_obj + '.' + attrib)
 
-			are_values_equal = True
-			if isinstance(attrib_value, float): # check float
+			comparison_succeeded = False
+			if isinstance(attrib_value, bool): # MUST check bool before int because True/False passes isinstance(x, int) too.
+				comparison_succeeded = compare_func(attrib_value, self.string_to_bool(expected_value))
+			elif isinstance(attrib_value, int):
 				try:
-					float_value = float(expected_value)
-					are_values_equal = self.are_floats_equal(float_value, attrib_value)
+					expected_value_int = int(expected_value)
+					comparison_succeeded = compare_func(attrib_value, expected_value_int)
 				except:
-					self.output_error('%s is a number; your value should be too.' % (curr_obj + '.' + attrib))
+					self.output_error('%s is an int; your value should be too.' % (curr_obj + '.' + attrib))
 					continue
-			elif isinstance(attrib_value, bool): # check bool
-				are_values_equal = self.string_to_bool(expected_value) == attrib_value
-			else: # directly convert and hope otherwise
+			elif isinstance(attrib_value, float):
 				try:
-					are_values_equal = expected_value == attrib_value
-				except:
-					self.output_error('Something went wrong!  Contact your local TA.')
+					expected_value_float = float(expected_value)
+					comparison_succeeded = compare_func(attrib_value, expected_value_float)
+				except Exception as ex:
+					print ex.message
+					self.output_error('%s is a float; your value should be too.' % (curr_obj + '.' + attrib))
+					continue
+
 
 			# output mismatch notifications
-			if not are_values_equal:
-				self.output_mismatch_value(curr_obj, attrib, expected_value, attrib_value)
+			if not comparison_succeeded:
+				# mini-hack: convert string to bool here if necessary to show True/False instead of 0/1/t/f/etc.
+				self.output_mismatch_value(curr_obj, attrib, self.validation_attribs_shouldbe.currentText(), self.string_to_bool(expected_value) if isinstance(attrib_value, bool) else expected_value, attrib_value)
 				error_count += 1
 
 		self.output_error('Done (%s errors).' % error_count)
 	#end
 
-	def string_to_bool(self, string):
-		return string.lower() in ['true', 't', 'yes', 'y', '1']
+	def are_types_equal(self, a, b):
+		return type(a) == type(b)
 	#end
 
-	def are_floats_equal(self, a, b, epsilon=0.000001):
-		return abs(b - a) < epsilon
+	def are_equal(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'are_equal\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+
+		if isinstance(a, int):
+			return a == b
+
+		if isinstance(a, float):
+			return abs(b - a) < 0.000001 # epsilon
+
+		if isinstance(a, bool):
+			return a == b
+
+		self.output_error('Type not covered in \'are_equal\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+
+	def are_not_equal(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'are_not_equal\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+
+		if isinstance(a, int):
+			return not (a == b)
+
+		if isinstance(a, float):
+			return not (abs(b - a) < 0.000001) # epsilon
+
+		if isinstance(a, bool):
+			return not (a == b)
+
+		self.output_error('Type not covered in \'are_not_equal\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+	
+	def is_less(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'is_less\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+		
+		if isinstance(a, int):
+			return a < b
+
+		if isinstance(a, float):
+			return a < b
+
+		if isinstance(a, bool):
+			return False # bools are either equal or not equal
+
+		self.output_error('Type not covered in \'is_less\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+
+	def is_lequal(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'is_lequal\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+		
+		if isinstance(a, int):
+			return a <= b
+
+		if isinstance(a, float):
+			return a < b or self.are_equal(a, b)
+
+		if isinstance(a, bool):
+			return a == b # can only check equality
+
+		self.output_error('Type not covered in \'is_lequal\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+
+	def is_greater(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'is_greater\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+		
+		if isinstance(a, int):
+			return a > b
+
+		if isinstance(a, float):
+			return a > b
+
+		if isinstance(a, bool):
+			return False # bools are either equal or not equal
+
+		self.output_error('Type not covered in \'is_greater\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+
+	def is_grequal(self, a, b):
+		if not self.are_types_equal(a, b):
+			self.output_error('Type mismatch in \'is_grequal\' (%s, %s)! Returning False.' % (type(a), type(b)))
+			return False
+		
+		if isinstance(a, int):
+			return a >= b
+
+		if isinstance(a, float):
+			return a > b or self.are_equal(a, b)
+
+		if isinstance(a, bool):
+			return a == b # can only check equality
+
+		self.output_error('Type not covered in \'is_grequal\' (%s)! Returning False.' % type(a))
+		return False
+	#end
+
+	def string_to_bool(self, string):
+		return string.lower() in ['true', 't', 'yes', 'y', '1']
 	#end
 
 	def get_current_attrib(self):
@@ -257,7 +396,7 @@ class ValueChecker(QtWidgets.QDialog):
 
 		all_attribs = set()
 		for curr_obj in self.get_filtered_objects():
-			obj_attributes = mc.listAttr(curr_obj, s=True) # only scalars
+			obj_attributes = mc.listAttr(curr_obj, s=True) # only scalars (includes booleans and integer-based enums)
 			if None == obj_attributes:
 				continue
 			all_attribs = all_attribs | set(obj_attributes)

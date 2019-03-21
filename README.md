@@ -52,7 +52,7 @@ A feature largely missing from a number of 3D software packages is the ability t
 ---
 
 ### Value Checker
-This script lets you validate the values of many objects at the same time.  You can select any number of objects matching a regular expression (or text string) by name, filter further by their type, and then determine which from the resulting list you wish to check.  You can check one attribute at a time for all chosen elements to see if its value is what you expect.  There are also three checkboxes for validation of zero translation, zero rotation, and unit scale, which is especially helpful for rigging.  This version only supports equality checking, but it would be easy to add others.
+This script lets you validate the values of many objects at the same time.  You can select any number of objects matching a regular expression (or text string) by name, filter further by their type, and then determine which from the resulting list you wish to check.  You can check one attribute at a time for all chosen elements to see if its value is what you expect.  There are also three checkboxes for validation of zero translation, zero rotation, and unit scale, which is especially helpful for rigging.
 
 <img src="https://raw.githubusercontent.com/KasumiL5x/misc-scripts/master/maya/valuechecker/valuechecker.png" width="30%" alt="AnimCurve Toolbox" />
 
