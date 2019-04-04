@@ -4,6 +4,42 @@
 This is a collection of various scripts that I have made that were not substantial enough to warrant their own repository, but were still worthy of sharing.
 
 ## Contents
+### Null Extensions
+An object extension for C# to enable [Null-Conditional Operator](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-conditional-operators) behavior in environments that do not support C# 6.  Made originally for Unity (as examples below show) but can be used anywhere.
+#### With
+`With` lets us traverse a chain of objects no matter the length without having to check for null.
+```C#
+var text = transform.Find("text").With(x => x.GetComponent<TextMesh>());
+if( null == text ) {
+  // handle missing TextMesh
+}
+```
+#### Return
+`Return` operates in exactly the same manner as `With`, but returns a fallback value upon encountering a null instance.
+```C#
+var position = transform.Find("text").Return(x => x.transform.position, Vector3.zero);
+```
+#### If
+With `If`, we can define a function that operates on our input object and returns a boolean stating if the chain should continue or not.
+```C#
+var text = transform.Find("text").With(x => x.GetComponent<TextMesh>()).If(x => "hello" == x.text);
+ 
+// alternatively, with a function:
+bool myCondition( TextMesh textMesh ) {
+	return "hello" == textMesh.text;
+}
+var text = transform.Find("text").With(x => x.GetComponent<TextMesh>()).If(x => myCondition(x));
+```
+#### Unless
+`Unless` is the inverse of `If`.
+#### Do
+The `Do` extension lets us execute a given function on the input object providing it is not null, passing the object along the chain after the function is complete.
+```C#
+var text = transform.Find("text").Do(x => process(x)).With(x => x.GetComponent<TextMesh>());
+```
+
+---
+
 ### Maximum Replacer
 Renaming operations can sometimes be tricky. Maya comes with a renaming ability, but it is rather trivial.  When cases arise where the functionality of built-in renaming is not sufficient, it is not uncommon to create a one-time script or even resort to manual renaming.  Coincidentally, [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) are especially proficient in pattern matching and can be used to aid string substitution.  Maximum Replacer lets you select and rename rename objects using regular expressions, making those convoluted rename operations a walk in the park.  Providing your regular expressions are up-to-scratch, of course.
 
