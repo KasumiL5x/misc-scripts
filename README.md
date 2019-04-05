@@ -4,6 +4,11 @@
 This is a collection of various scripts that I have made that were not substantial enough to warrant their own repository, but were still worthy of sharing.
 
 ## Contents
+### Unity
+This folder contains a collection of scripts for Unity.  Please look at each file for a description.
+
+---
+
 ### Null Extensions
 An object extension for C# to enable [Null-Conditional Operator](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/null-conditional-operators) behavior in environments that do not support C# 6.  Made originally for Unity (as examples below show) but can be used anywhere.
 #### With
